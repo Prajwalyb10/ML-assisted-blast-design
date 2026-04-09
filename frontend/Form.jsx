@@ -11,6 +11,27 @@ const PATTERNS = [
   { value: "fan", label: "Fan" },
 ];
 
+const FALLBACK_ROCK_OPTIONS = [
+  { value: 1, label: "Limestone (1)" },
+  { value: 3, label: "Shale (3)" },
+  { value: 4, label: "Sandstone (4)" },
+  { value: 5, label: "Basalt (5)" },
+  { value: 6, label: "Granite (6)" },
+];
+
+const FALLBACK_INITIATION_OPTIONS = [
+  { value: 1, label: "Line (1)" },
+  { value: 2, label: "Staggered (2)" },
+  { value: 3, label: "Diagonal (3)" },
+  { value: 4, label: "V-Pattern (4)" },
+];
+
+const FALLBACK_EXPLOSIVE_OPTIONS = [
+  { value: 1, label: "Emulsion (1)" },
+  { value: 2, label: "ANFO (2)" },
+  { value: 3, label: "Slurry (3)" },
+];
+
 const FALLBACK_DEFAULTS = {
   rows: 4,
   holes_per_row: 6,
@@ -104,7 +125,8 @@ function SelectField({ label, name, value, onChange, options }) {
 }
 
 function mapOptions(optionMap) {
-  return Object.entries(optionMap || {}).map(([value, label]) => ({
+  if (!optionMap) return [];
+  return Object.entries(optionMap).map(([value, label]) => ({
     value: Number(value),
     label: `${label} (${value})`,
   }));
@@ -135,6 +157,9 @@ export default function Form({ onGenerate, loading, referenceData, bootLoading }
   const rockOptions = mapOptions(referenceData?.options?.rock_type);
   const explosiveOptions = mapOptions(referenceData?.options?.explosive_type);
   const initiationOptions = mapOptions(referenceData?.options?.initiation_sequence);
+  const safeRockOptions = rockOptions.length ? rockOptions : FALLBACK_ROCK_OPTIONS;
+  const safeExplosiveOptions = explosiveOptions.length ? explosiveOptions : FALLBACK_EXPLOSIVE_OPTIONS;
+  const safeInitiationOptions = initiationOptions.length ? initiationOptions : FALLBACK_INITIATION_OPTIONS;
   const invalidDepth = form.hole_depth_m < form.bench_height_m;
 
   return (
@@ -154,7 +179,7 @@ export default function Form({ onGenerate, loading, referenceData, bootLoading }
           <SelectField label="Pattern Override" name="pattern_override" value={form.pattern_override} onChange={updateField} options={PATTERNS} />
 
           <div className="subsection-title">Rock Mass</div>
-          <SelectField label="Rock Type" name="rock_type_code" value={form.rock_type_code} onChange={updateField} options={rockOptions} />
+          <SelectField label="Rock Type" name="rock_type_code" value={form.rock_type_code} onChange={updateField} options={safeRockOptions} />
           <div className="row2">
             <NumberField label="Density (g/cc)" name="density_gcc" value={form.density_gcc} onChange={updateField} step={0.01} min={1} max={4} />
             <NumberField label="UCS (MPa)" name="ucs_mpa" value={form.ucs_mpa} onChange={updateField} step={0.1} min={1} max={400} />
@@ -183,8 +208,8 @@ export default function Form({ onGenerate, loading, referenceData, bootLoading }
             <NumberField label="Delay Timing (ms)" name="delay_timing_ms" value={form.delay_timing_ms} onChange={updateField} min={0} max={1000} />
           </div>
           <div className="row2">
-            <SelectField label="Initiation Sequence" name="initiation_sequence_code" value={form.initiation_sequence_code} onChange={updateField} options={initiationOptions} />
-            <SelectField label="Explosive Type" name="explosive_type_code" value={form.explosive_type_code} onChange={updateField} options={explosiveOptions} />
+            <SelectField label="Initiation Sequence" name="initiation_sequence_code" value={form.initiation_sequence_code} onChange={updateField} options={safeInitiationOptions} />
+            <SelectField label="Explosive Type" name="explosive_type_code" value={form.explosive_type_code} onChange={updateField} options={safeExplosiveOptions} />
           </div>
 
           <div className="subsection-title">Environment</div>

@@ -40,7 +40,7 @@ export default function App() {
         const data = await res.json();
         setReferenceData(data);
       } catch (err) {
-        setError(err.message);
+        setError(`Could not reach backend at ${API_BASE}. Check VITE_API_BASE_URL and Render CORS. ${err.message}`);
       } finally {
         setBootLoading(false);
       }
