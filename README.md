@@ -1,12 +1,16 @@
 # Blast Design Dashboard
 
-ML-backed blast design and visualization app built with FastAPI, scikit-learn, React, and Vite.
+ML-backed blast design and visualization app built as a small monorepo:
+
+- `frontend/`: React + Vite app for the UI
+- `backend/`: FastAPI + scikit-learn API for prediction and layout generation
 
 ## Local Run
 
 Backend:
 
 ```bash
+cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
@@ -14,14 +18,9 @@ uvicorn main:app --reload --port 8000
 Frontend:
 
 ```bash
+cd frontend
 npm install
 npm run dev
-```
-
-Optional local env file:
-
-```bash
-copy .env.example .env
 ```
 
 ## Environment Variables
@@ -38,50 +37,50 @@ Backend:
 CORS_ORIGINS=http://127.0.0.1:3000
 ```
 
-For production, set `VITE_API_BASE_URL` to your public backend URL and set `CORS_ORIGINS` to your public frontend URL.
+Example env files are included at:
+
+- [`frontend/.env.example`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/frontend/.env.example)
+- [`backend/.env.example`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/backend/.env.example)
 
 ## Deploy Online
 
-Recommended setup:
-
-1. Deploy the FastAPI backend to Render.
-2. Deploy the Vite frontend to Vercel.
-3. Point the frontend env var to the backend URL.
-4. Point the backend CORS env var to the frontend URL.
+Use different project roots for each platform:
 
 ### Render Backend
 
-This repo includes [`render.yaml`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/render.yaml).
+Repo: [ML-assisted-blast-design](https://github.com/Prajwalyb10/ML-assisted-blast-design)
 
-Build command:
+Settings:
 
-```bash
-pip install -r requirements.txt
-```
+- Root Directory: `backend`
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Environment Variable: `PYTHON_VERSION=3.11.9`
 
-Start command:
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port $PORT
-```
-
-Set this environment variable in Render after you know your frontend URL:
+After Vercel gives you a frontend URL, add:
 
 ```bash
 CORS_ORIGINS=https://your-frontend.vercel.app
 ```
 
+This repo also includes [`render.yaml`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/render.yaml) with `rootDir: backend`.
+
 ### Vercel Frontend
 
-This repo includes [`vercel.json`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/vercel.json).
+Repo: [ML-assisted-blast-design](https://github.com/Prajwalyb10/ML-assisted-blast-design)
 
-Set this environment variable in Vercel:
+Settings:
+
+- Root Directory: `frontend`
+- Framework Preset: `Vite`
+
+Environment variable:
 
 ```bash
 VITE_API_BASE_URL=https://your-backend.onrender.com
 ```
 
-Then redeploy the frontend.
+The frontend config file is at [`frontend/vercel.json`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/frontend/vercel.json).
 
 ## API Endpoints
 
@@ -92,6 +91,6 @@ Then redeploy the frontend.
 
 ## Notes
 
-- The ML models are trained from [`blast_ml_dataset.csv`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/blast_ml_dataset.csv) at app startup.
-- The frontend uses the backend's `/reference-data` endpoint to prefill model-driven defaults.
-- The app returns predicted geometry, explosive loading, flyrock estimate, selected pattern, and plotted hole coordinates in one response.
+- The ML models train from [`backend/blast_ml_dataset.csv`](/D:/BadAss%20Project%20??/ml-assist-blast%20design/backend/blast_ml_dataset.csv) at app startup.
+- The frontend loads defaults from the backend `/reference-data` endpoint.
+- The app returns predicted burden, spacing, explosive loading, flyrock estimate, selected pattern, and plotted hole coordinates in one response.
